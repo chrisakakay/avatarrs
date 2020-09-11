@@ -24,10 +24,9 @@ fn main() {
 fn get_key_sequence(temp: String) -> String {
     let v: Vec<&str> = temp.lines().collect();
     let c = v[16].to_string(); // BODY OF THE REQUEST
+    let c2: Vec<&str> = c.split("\"").collect(); // SPLIT HACK
 
-    println!("{}", c);
-
-    return "".to_string();
+    return c2[3].to_string();
 }
 
 fn handle_connection(mut stream: TcpStream) {
@@ -39,7 +38,7 @@ fn handle_connection(mut stream: TcpStream) {
 
     let route_index = b"GET / HTTP/1.1\r\n";
     let js_index = b"GET /index.js HTTP/1.1\r\n";
-    let command_index = b"POST /command HTTP/1.1\r\n";
+    let keys_index = b"POST /keys HTTP/1.1\r\n";
 
     if buffer.starts_with(route_index) {
         log(format!("{} {}", "I".green(), v[0]));
@@ -47,10 +46,11 @@ fn handle_connection(mut stream: TcpStream) {
     } else if buffer.starts_with(js_index) {
         log(format!("{} {}", "I".green(), v[0]));
         response::send(stream, response::CODE::C200, response::from_file("webcontent/index.js"));
-    } else if buffer.starts_with(command_index) {
+    } else if buffer.starts_with(keys_index) {
         let key_sequence: String = get_key_sequence(String::from_utf8_lossy(&buffer[..]).to_string());
         if !key_sequence.is_empty() {
-            let mut enigo = Enigo::new(); // enigo.key_sequence_parse("{+CTRL}a{-CTRL}");
+            let mut enigo = Enigo::new();
+            log(format!("{} {}", "I".green(), key_sequence.yellow()));
             enigo.key_sequence_parse(&key_sequence);
         }
         response::send(stream, response::CODE::C200, "{}".to_string());
