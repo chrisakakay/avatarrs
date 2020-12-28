@@ -13,7 +13,7 @@ const AVATAR = (function() {
   }
 
   onButtonClick = () => {
-    fetch('http://localhost:7878/keys', {
+    fetch('/keys', {
       method: 'POST',
       body: JSON.stringify({ keys: '{+CTRL}a{-CTRL}' })
     }).then(function(response) {
